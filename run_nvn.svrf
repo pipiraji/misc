@@ -1,0 +1,56 @@
+// ==============================================================
+// Auto-Generated Calibre NVN Runset
+// ==============================================================
+
+// --- 1. 입력 시스템 설정 ---
+LAYOUT SYSTEM SPICE
+LAYOUT PATH "test_inputs\target.sp"
+LAYOUT PRIMARY "TOP"
+
+SOURCE SYSTEM SPICE
+SOURCE PATH "test_inputs\reference.sp"
+SOURCE PRIMARY "TOP"
+
+// --- 2. 매칭 옵션 ---
+// 1:1 SPICE-to-SPICE 완전 비교 플로우.
+// 게이트 인식/전원망 선언 불필요 — 넷리스트 위상 그대로 비교.
+LVS INJECT LOGIC YES
+LVS RECOGNIZE GATES NONE
+LVS COMPARE CASE NO
+LVS CHECK PORT NAMES YES
+
+// --- 3. 리포트 설정 ---
+// 목적: 불일치(디바이스 수, 넷, 파라미터) 전량 출력 + 최대 가독성
+//
+// BX  : BOX 처리된 셀 목록을 setup 섹션에 출력 → BOX 적용 확인용
+// FX  : DETAILED ERROR ANALYSIS 섹션 활성화 → 오류 원인 한눈에 파악
+// G   : Property Error 불일치 시 인스턴스 연결 상세 출력 → 파라미터 오류 디버깅
+// D   : Missing Instance/Gate 불일치 시 인스턴스 연결 상세 출력 → 디바이스 수 미스매치
+// NP  : 정상 매칭된 핀은 report에서 생략 → 오류 핀만 집중 표시
+// NE  : 디바이스 인스턴스 수 미스매치 시 NOT COMPARED로 즉시 표시
+// RA  : Ambiguity resolution 포인트 출력 억제 → report 노이즈 제거
+LVS REPORT "lvs_compare.rep"
+LVS REPORT OPTION BX FX G D NP NE RA
+
+// --- 4. 기생 성분 필터링 ---
+// PEX 넷리스트의 기생 C → OPEN, 기생 R → SHORT 처리하여 넷 병합.
+LVS FILTER C OPEN
+LVS FILTER R SHORT
+
+// --- 5. LVS BOX 선언 ---
+LVS BOX inv
+LVS BOX nand
+LVS BOX withquote
+
+// --- 6. Trace Properties ---
+
+// [inv]
+TRACE PROPERTY inv "l" "l" 0
+TRACE PROPERTY inv "w" "w" 0
+
+// [nand]
+TRACE PROPERTY nand "w" "w" 0
+
+// [withquote]
+TRACE PROPERTY withquote "param1" "param1" 0
+TRACE PROPERTY withquote "size" "size" 0
