@@ -7,7 +7,9 @@ from lama_file import LamaFile
 class TestLamaFile(unittest.TestCase):
     def test_test_inputs_directory_size_under_limit(self):
         base_dir = os.path.dirname(__file__)
-        target_path = os.path.join(base_dir, "test_inputs")
+        target_path = os.path.abspath(
+            os.path.join(base_dir, "..", "NVN", "test_inputs")
+        )
 
         lama = LamaFile()
         result = lama.is_tgz_under_limit(target_path, limit_mb=100)
