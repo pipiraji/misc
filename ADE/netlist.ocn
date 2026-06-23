@@ -1,0 +1,51 @@
+;; ========================================================
+;; Single OCEAN Script: Spectre & HSPICE Netlist Generation
+;; (Hierarchy stops at 'starrc' view)
+;; ========================================================
+
+printf("==================================================\n")
+printf("Starting Unified Netlist Generation...\n")
+printf("==================================================\n")
+
+;; --------------------------------------------------------
+;; 1. Spectre 넷리스트 생성
+;; --------------------------------------------------------
+printf("\n---> [1/2] Generating Spectre Netlist...\n")
+
+;; 시뮬레이터 및 디자인 지정
+simulator('spectre)
+design("tblib" "tbcell" "schematic")
+
+;; Spectre용 View List 설정 (starrc 포함)
+envOption('switchViewList '("spectre" "cmos_sch" "cmos.sch" "schematic" "veriloga" "starrc" "symbol"))
+envOption('stopViewList '("spectre" "starrc"))
+
+;; 넷리스트 저장 디렉토리 및 생성
+resultsDir("./netlist_spectre")
+createNetlist(?recreateAll t ?display nil)
+
+printf("Spectre netlist generated at: ./netlist_spectre/netlist\n")
+
+;; --------------------------------------------------------
+;; 2. HSPICE 넷리스트 생성
+;; --------------------------------------------------------
+printf("\n---> [2/2] Generating HSPICE Netlist...\n")
+
+;; 시뮬레이터 변경 (환경에 따라 'hspiceD' 또는 'hspice' 사용)
+simulator('hspiceD)
+design("tblib" "tbcell" "schematic")
+
+;; HSPICE용 View List 설정
+;; (주의: HSPICE이므로 'spectre' 대신 'hspiceD'나 'spice' 뷰를 우선 탐색하도록 설정)
+envOption('switchViewList '("hspiceD" "spice" "cmos_sch" "cmos.sch" "schematic" "starrc" "symbol"))
+envOption('stopViewList '("hspiceD" "starrc"))
+
+;; 넷리스트 저장 디렉토리 및 생성
+resultsDir("./netlist_hspice")
+createNetlist(?recreateAll t ?display nil)
+
+printf("HSPICE netlist generated at: ./netlist_hspice/netlist\n")
+
+printf("\n==================================================\n")
+printf("All netlist generation completed successfully!\n")
+printf("==================================================\n")
